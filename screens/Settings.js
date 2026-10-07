@@ -1,22 +1,56 @@
-import { View, StyleSheet, Switch, Text } from "react-native";
-import { COLORS_DARK } from "../constants";
+import { View, StyleSheet, Text, Switch } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { themeActions } from "../store/themeSlice";
 
 function Settings() {
+  const dispatch = useDispatch();
+
+  const isDark = useSelector((state) => state.theme.isDark);
+  const colors = useSelector((state) => state.theme.colors);
+
+  function onThemeChange() {
+    dispatch(themeActions.toggle());
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.caption}>Choose color theme:</Text>
-      <View style={styles.switchContainer}>
-        <Text style={styles.caption}>Light</Text>
-        <Switch
-          trackColor={{
-            false: COLORS_DARK.grey300,
-            true: COLORS_DARK.primary300,
+    <View
+      style={{
+        ...styles.container,
+        backgroundColor: colors.appBackground,
+      }}
+    >
+      <Text
+        style={{
+          ...styles.title,
+          color: colors.fontMain,
+        }}
+      >
+        Choose color theme:
+      </Text>
+
+      <View style={styles.themeContainer}>
+        <Text
+          style={{
+            ...styles.themeText,
+            color: colors.fontMain,
           }}
-          thumbColor={COLORS_DARK.primary900}
-          ios_backgroundColor={COLORS_DARK.primary200}
-          style={{ transform: [{ scaleX: 2 }, { scaleY: 2 }] }}
+        >
+          Light
+        </Text>
+
+        <Switch
+          value={isDark}
+          onValueChange={onThemeChange}
         />
-        <Text style={styles.caption}>Dark</Text>
+
+        <Text
+          style={{
+            ...styles.themeText,
+            color: colors.fontMain,
+          }}
+        >
+          Dark
+        </Text>
       </View>
     </View>
   );
@@ -25,20 +59,24 @@ function Settings() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: COLORS_DARK.appBackground,
+    padding: 20,
   },
-  switchContainer: {
-    alignItems: "center",
-    justifyContent: "center",
+
+  title: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 30,
+  },
+
+  themeContainer: {
     flexDirection: "row",
-    marginBottom: 100,
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
   },
-  caption: {
+
+  themeText: {
     fontSize: 18,
-    margin: 30,
-    color: COLORS_DARK.fontMain,
   },
 });
 

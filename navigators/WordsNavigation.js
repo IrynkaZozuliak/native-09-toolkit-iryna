@@ -1,46 +1,48 @@
+// navigators/WordsNavigation.js
+
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useSelector } from "react-redux";
 
 import AllWords from "../screens/Words/AllWords";
 import AddWord from "../screens/Words/AddWord";
 import EditWord from "../screens/Words/EditWord";
-import { COLORS_DARK } from "../constants";
 
 const Stack = createNativeStackNavigator();
 
 function WordsNavigation() {
+  const colors = useSelector((state) => state.theme.colors);
+
   return (
     <Stack.Navigator
       screenOptions={{
-        headerTitleStyle: { fontWeight: "800" },
-        headerTransparent: true,
-        headerTintColor: COLORS_DARK.primary900,
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: colors.appBackground,
+        },
+        headerTintColor: colors.primary900,
         headerTitleAlign: "center",
-        contentStyle: { backgroundColor: COLORS_DARK.appBackground },
       }}
     >
       <Stack.Screen
         name="AllWords"
-        options={{
-          headerShown: false,
-        }}
         component={AllWords}
+        options={{ title: "All words" }}
       />
+
       <Stack.Screen
         name="AddWord"
-        options={{
-          title: "Add Word",
-        }}
         component={AddWord}
+        options={{ title: "Adding word" }}
       />
+
       <Stack.Screen
         name="EditWord"
-        options={({ route }) => {
-          const word = route.params.wordData.word;
-          return {
-            title: `Editing word "${word}"`,
-          };
-        }}
         component={EditWord}
+        options={({ route }) => ({
+          title: route.params?.wordData?.word
+            ? `Editing word "${route.params.wordData.word}"`
+            : "Editing word",
+        })}
       />
     </Stack.Navigator>
   );

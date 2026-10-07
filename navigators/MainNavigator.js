@@ -1,69 +1,78 @@
-import "react-native-gesture-handler";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+// navigators/MainNavigator.js
+
 import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useSelector } from "react-redux";
 
 import WordsNavigation from "./WordsNavigation";
 import LearningNavigation from "./LearningNavigation";
 import Settings from "../screens/Settings";
-import { StatusBar } from "react-native";
-import { COLORS_DARK } from "../constants";
 
 const Tab = createBottomTabNavigator();
 
 function MainNavigator() {
+  const colors = useSelector((state) => state.theme.colors);
+
   return (
-    <>
-      <StatusBar
-        backgroundColor={COLORS_DARK.appBackground}
-        barStyle={true ? "light-content" : "dark-content"}
-      />
-      <NavigationContainer>
-        <Tab.Navigator
-          screenOptions={{
-            headerTitleStyle: { fontWeight: "800" },
-            tabBarActiveTintColor: COLORS_DARK.primary900,
-            tabBarActiveBackgroundColor: COLORS_DARK.appBackground,
-            tabBarInactiveBackgroundColor: COLORS_DARK.appBackground,
-            headerStyle: {
-              backgroundColor: COLORS_DARK.appBackground,
-            },
-            headerTintColor: COLORS_DARK.primary900,
-            headerTitleAlign: "center",
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+
+          tabBarActiveTintColor: colors.primary900,
+          tabBarInactiveTintColor: colors.fontMain,
+          tabBarStyle: {
+            backgroundColor: colors.appBackground,
+          },
+          tabBarLabelStyle: {
+            fontSize: 12,
+          },
+        }}
+      >
+        <Tab.Screen
+          name="Words"
+          component={WordsNavigation}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons
+                name="list-outline"
+                size={size}
+                color={color}
+              />
+            ),
           }}
-        >
-          <Tab.Screen
-            name="Words"
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="list-outline" size={size} color={color} />
-              ),
-            }}
-            component={WordsNavigation}
-          />
-          <Tab.Screen
-            name="Learning"
-            component={LearningNavigation}
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="book-outline" size={size} color={color} />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="Settings"
-            component={Settings}
-            options={{
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="settings-outline" size={size} color={color} />
-              ),
-            }}
-          />
-        </Tab.Navigator>
-      </NavigationContainer>
-    </>
+        />
+
+        <Tab.Screen
+          name="Learning"
+          component={LearningNavigation}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons
+                name="book-outline"
+                size={size}
+                color={color}
+              />
+            ),
+          }}
+        />
+
+        <Tab.Screen
+          name="Settings"
+          component={Settings}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons
+                name="settings-outline"
+                size={size}
+                color={color}
+              />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 

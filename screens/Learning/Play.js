@@ -1,34 +1,75 @@
-import { View, Text, StyleSheet, Image } from "react-native";
-import { useState } from "react";
-
+import { View, Text, StyleSheet, Pressable } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import WordCard from "../../components/WordCard";
-import { COLORS_DARK } from "../../constants";
+import { wordsLearningActions } from "../../store/wordsLearningSlice";
 
-export default function Play() {
-  const wordsToStudy = [];
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+function Play() {
+  const dispatch = useDispatch();
+
+  const words = useSelector((state) => state.wordsLearning.words);
+  const colors = useSelector((state) => state.theme.colors);
+
+  const wordsToLearn = words.filter((word) => word.status < 2);
+
+  if (wordsToLearn.length === 0) {
+    return (
+      <View
+        style={{
+          ...styles.container,
+          backgroundColor: colors.appBackground,
+        }}
+      >
+        <Text style={{ ...styles.congrats, color: colors.fontMain }}>
+          Congrats!
+        </Text>
+      </View>
+    );
+  }
+
+  const word = wordsToLearn[0];
+
+  function onDidntKnow() {
+    dispatch(wordsLearningActions.updateStatuses());
+  }
+
+  function onKnewIt() {
+    dispatch(wordsLearningActions.updateWordLearnInfo(word.word));
+  }
 
   return (
-    <View style={styles.container}>
-      {wordsToStudy.length === 0 ? (
-        <>
-          <Text style={[styles.text, { alignSelf: "center" }]}>Congrats!</Text>
-          <Text style={styles.text}>For now you have learnt all the words</Text>
-          <Image
-            style={styles.image}
-            source={require("../../assets/well-done-icon.png")}
-          />
-        </>
-      ) : (
-        <WordCard
-          wordInfo={wordsToStudy[currentWordIndex % wordsToStudy.length]}
-          setNext={() =>
-            setCurrentWordIndex(
-              (currentWordIndex) => (currentWordIndex + 1) % wordsToStudy.length
-            )
-          }
-        />
-      )}
+    <View
+      style={{
+        ...styles.container,
+        backgroundColor: colors.appBackground,
+      }}
+    >
+      <WordCard wordInfo={word} />
+
+      <View style={styles.buttons}>
+        <Pressable
+          style={{
+            ...styles.button,
+            backgroundColor: colors.primary200,
+          }}
+          onPress={onDidntKnow}
+        >
+          <Text style={{ ...styles.buttonText, color: colors.fontMain }}>
+            Didn't know it
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={{
+            ...styles.button,
+            backgroundColor: colors.primary300,
+          }}
+          onPress={onKnewIt}
+        >
+          <Text style={{ ...styles.buttonText, color: colors.fontMain }}>
+            Knew it
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -36,19 +77,27 @@ export default function Play() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS_DARK.appBackground,
+    padding: 20,
   },
-  text: {
-    color: COLORS_DARK.fontMain,
-    fontSize: 22,
-    margin: 10,
-    marginTop: 25,
+  congrats: {
+    fontSize: 28,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 50,
   },
-  image: {
-    width: "100%",
-    height: undefined,
-    aspectRatio: 1,
-    alignSelf: "center",
-    resizeMode: "contain",
+  buttons: {
+    marginTop: 30,
+    gap: 15,
+  },
+  button: {
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
+
+export default Play;

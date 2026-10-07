@@ -1,52 +1,63 @@
-import { View, StyleSheet, Text, StatusBar, Pressable } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
+import { useSelector, useDispatch } from "react-redux";
 
-import { playSound } from "../services/soundHandler";
-import { COLORS_DARK } from "../constants";
+import { wordsLearningActions } from "../store/wordsLearningSlice";
 
-function Item({ item }) {
-  const navigation = useNavigation();
+function ListItem({ item, onDelete }) {
+  const dispatch = useDispatch();
+
+  const colors = useSelector((state) => state.theme.colors);
+
+  function getStatusIcon(status) {
+    if (status === 0) {
+      return "battery-dead-sharp";
+    }
+
+    if (status === 1) {
+      return "battery-half-sharp";
+    }
+
+    return "battery-full-sharp";
+  }
+
+  function handleDelete() {
+    if (onDelete) {
+      onDelete();
+      return;
+    }
+
+    dispatch(wordsLearningActions.removeWord(item.word));
+  }
 
   return (
-    <View style={styles.item}>
-      <Pressable disabled={!item.audio} onPress={() => playSound(item.audio)}>
-        <View style={styles.iconContainer}>
-          <Ionicons
-            name="play-outline"
-            size={28}
-            style={
-              !item.audio
-                ? { color: COLORS_DARK.grey300 }
-                : { color: COLORS_DARK.primary900 }
-            }
-          />
-        </View>
-      </Pressable>
-      <Pressable
-        style={styles.textContainer}
-        onPress={() => navigation.navigate("EditWord", { wordData: item })}
+    <View
+      style={{
+        ...styles.container,
+        borderColor: colors.primary200,
+        backgroundColor: colors.appBackground,
+      }}
+    >
+      <Text
+        style={{
+          ...styles.word,
+          color: colors.fontMain,
+        }}
       >
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={styles.title}>{item.word}</Text>
-          <Ionicons
-            name={`battery-${
-              item.status === 0 ? "dead" : item.status === 1 ? "half" : "full"
-            }-sharp`}
-            size={18}
-            color={COLORS_DARK.primary900}
-          />
-        </View>
-        <Text style={styles.definition}>{item.meaning}</Text>
-      </Pressable>
-      <Pressable
-        style={styles.iconContainer}
-        onPress={() => dispatch(wordsLearningActions.removeWord(item.word))}
-      >
+        {item.word}
+      </Text>
+
+      <Ionicons
+        name={getStatusIcon(item.status)}
+        size={28}
+        color={colors.primary900}
+      />
+
+      <Pressable onPress={handleDelete}>
         <Ionicons
           name="trash-outline"
-          size={22}
-          color={COLORS_DARK.secondary800}
+          size={24}
+          color={colors.secondary800}
         />
       </Pressable>
     </View>
@@ -54,36 +65,21 @@ function Item({ item }) {
 }
 
 const styles = StyleSheet.create({
-    item: {
-      zIndex: -10,
-      backgroundColor: COLORS_DARK.fontInverse,
-      flexDirection: "row",
-      marginVertical: 6,
-      marginHorizontal: 5,
-      alignItems: "center",
-      paddingHorizontal: 5,
-      borderRadius: 8,
-      elevation: 4,
-    },
-    title: {
-      fontSize: 20,
-      fontWeight: "800",
-      color: COLORS_DARK.fontMain,
-      paddingRight: 20,
-    },
-    definition: {
-      fontSize: 16,
-      color: COLORS_DARK.fontMain,
-    },
-    iconContainer: {
-      padding: 3,
-      borderRadius: 20,
-    },
-    textContainer: {
-      flex: 1,
-      paddingLeft: 10,
-      paddingBottom: 5,
-    },
-  });
+  container: {
+    minHeight: 60,
+    marginHorizontal: 10,
+    marginVertical: 5,
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 15,
+    flexDirection: "row",
+    alignItems: "center",
+  },
 
-export default Item;
+  word: {
+    flex: 1,
+    fontSize: 22,
+  },
+});
+
+export default ListItem;

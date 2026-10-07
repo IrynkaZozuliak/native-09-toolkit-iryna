@@ -1,93 +1,102 @@
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  Image,
-  Pressable,
-  Text,
-} from "react-native";
-import Item from "../../components/ListItem";
+import { View, StyleSheet, Text, Pressable, FlatList } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { COLORS_DARK } from "../../constants";
+
+import { wordsLearningActions } from "../../store/wordsLearningSlice";
+import ListItem from "../../components/ListItem";
 
 function AllWords({ navigation }) {
-  const words = [];
+  const dispatch = useDispatch();
+
+  const words = useSelector((state) => state.wordsLearning.words);
+  const colors = useSelector((state) => state.theme.colors);
+
+  function onAddWord() {
+    navigation.navigate("AddWord");
+  }
+
+  function onWordPress(wordData) {
+    navigation.navigate("EditWord", { wordData });
+  }
+
+  function onDeleteWord(word) {
+    dispatch(wordsLearningActions.removeWord(word));
+  }
 
   return (
-    <>
-      <Pressable
-        style={styles.addPressable}
-        onPress={() => navigation.navigate("AddWord")}
-      >
+    <View
+      style={{
+        ...styles.container,
+        backgroundColor: colors.appBackground,
+      }}
+    >
+      <Pressable style={styles.addButton} onPress={onAddWord}>
         <Ionicons
           name="add-outline"
-          size={46}
-          color={COLORS_DARK.fontInverse}
+          size={32}
+          color={colors.primary900}
         />
       </Pressable>
-      <View style={{ flex: 2 }}>
+
+      {words.length === 0 ? (
+        <View
+          style={{
+            ...styles.noWordsOuterContainer,
+            backgroundColor: colors.fontInverse,
+          }}
+        >
+          <View style={styles.noWordsInnerContainer}>
+            <Text
+              style={{
+                ...styles.noWordsText,
+                color: colors.primary200,
+              }}
+            >
+              No words yet
+            </Text>
+          </View>
+        </View>
+      ) : (
         <FlatList
           data={words}
-          renderItem={({ item }) => <Item item={item} />}
           keyExtractor={(item) => item.word}
-          ListEmptyComponent={
-            <View style={styles.empty}>
-              <Text style={styles.textEmpty}>No words yet</Text>
-            </View>
-          }
-          ListHeaderComponent={
-            <View style={styles.imageContainer}>
-              <Image
-                style={styles.image}
-                source={require("../../assets/study(option3).png")}
-              />
-            </View>
-          }
+          renderItem={({ item }) => (
+            <ListItem
+              item={item}
+              onPress={() => onWordPress(item)}
+              onDelete={() => onDeleteWord(item.word)}
+            />
+          )}
         />
-      </View>
-    </>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  imageContainer: {
-    height: 220,
-    alignItems: "center",
+  container: {
+    flex: 1,
+  },
+
+  addButton: {
+    alignSelf: "flex-end",
+    margin: 10,
+  },
+
+  noWordsOuterContainer: {
+    flex: 1,
     justifyContent: "center",
-    marginTop: 20,
-    marginBottom: 5,
-    zIndex: 10,
-  },
-  addPressable: {
-    position: "absolute",
-    width: 60,
-    borderRadius: 30,
-    aspectRatio: 1,
-    top: 200,
-    right: "10%",
-    backgroundColor: COLORS_DARK.primary900,
     alignItems: "center",
+  },
+
+  noWordsInnerContainer: {
     justifyContent: "center",
-    zIndex: 10,
-    elevation: 5,
-  },
-  image: {
-    width: "55%",
-    height: undefined,
-    aspectRatio: 1,
-    alignSelf: "center",
-    resizeMode: "contain",
-  },
-  empty: {
-    height: 300,
-    backgroundColor: COLORS_DARK.fontInverse,
     alignItems: "center",
-    justifyContent: "center",
-    elevation: 5,
   },
-  textEmpty: {
-    fontSize: 40,
-    color: COLORS_DARK.primary200,
+
+  noWordsText: {
+    fontSize: 20,
+    fontWeight: "600",
   },
 });
 
