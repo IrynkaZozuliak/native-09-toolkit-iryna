@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { wordsLearningActions } from "../store/wordsLearningSlice";
 
-function ListItem({ item, onDelete }) {
+function ListItem({ item, onPress, onDelete }) {
   const dispatch = useDispatch();
 
   const colors = useSelector((state) => state.theme.colors);
@@ -39,6 +39,7 @@ function ListItem({ item, onDelete }) {
       }}
     >
       <Text
+        onPress={onPress}
         style={{
           ...styles.word,
           color: colors.fontMain,
@@ -80,6 +81,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 22,
   },
+
 });
 
 export default ListItem;

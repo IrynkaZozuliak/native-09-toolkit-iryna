@@ -45,7 +45,12 @@ function AllWords({ navigation }) {
             backgroundColor: colors.fontInverse,
           }}
         >
-          <View style={styles.noWordsInnerContainer}>
+          <View
+            style={[
+              styles.noWordsInnerContainer,
+              { backgroundColor: colors.fontInverse },
+            ]}
+          >
             <Text
               style={{
                 ...styles.noWordsText,
